@@ -2,13 +2,12 @@ version: '3'
 
 volumes:
   uptime_monitor_local_postgres_data: {}
-  uptime_monitor_local_postgres_data_backups: {}
 
 services:
   django: &django
     build:
       context: .
-      dockerfile: ./compose/local/django/Dockerfile
+      dockerfile: ./docker/django/Dockerfile
     image: uptime_monitor_local_django
     container_name: uptime_monitor_local_django
     depends_on:
@@ -18,32 +17,27 @@ services:
     volumes:
       - .:/app:z
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ./.envs/.django
+      - ./.envs/.postgres
     ports:
       - "8000:8000"
     command: /start
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: uptime_monitor_production_postgres
+    image: postgres:14
     container_name: uptime_monitor_local_postgres
-    volumes:
       - uptime_monitor_local_postgres_data:/var/lib/postgresql/data
-      - uptime_monitor_local_postgres_data_backups:/backups
     env_file:
-      - ./.envs/.local/.postgres
+      - ./.envs/.postgres
 
   docs:
     image: uptime_monitor_local_docs
     container_name: uptime_monitor_local_docs
     build:
       context: .
-      dockerfile: ./compose/local/docs/Dockerfile
+      dockerfile: ./docker/docs/Dockerfile
     env_file:
-      - ./.envs/.local/.django
+      - ./.envs/.django
     volumes:
       - ./docs:/docs:z
       - ./config:/app/config:z
