@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   && rm -rf /var/lib/apt/lists/*
 
 # Requirements are installed here to ensure they will be cached.
-COPY ./requirements /requirements
+COPY ./requirements requirements
 
 # create python dependency wheels
 RUN pip wheel --no-cache-dir --wheel-dir /usr/src/app/wheels  \
@@ -57,7 +57,7 @@ COPY --from=python-build-stage /usr/src/app/wheels /wheels
 RUN pip install --no-cache /wheels/* \
   && rm -rf /wheels
 
-COPY ./compose/local/docs/start /start-docs
+COPY ./docker/docs/start /start-docs
 RUN sed -i 's/\r$//g' /start-docs
 RUN chmod +x /start-docs
 
