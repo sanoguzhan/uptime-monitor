@@ -13,6 +13,20 @@ SECRET_KEY = env(
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
 
+
+
+# AUTHENTICATION
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#admins
+ADMINS = [("""Demo user""", "demo@demo.demo"),
+          ]
+
+AUTHENTICATION_BACKENDS += [
+    'uptime_monitor.auth.local.LocalAuth',
+]
+
 # CACHES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches
