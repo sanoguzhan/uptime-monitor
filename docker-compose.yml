@@ -1,0 +1,88 @@
+version: '3'
+
+volumes:
+  uptime_monitor_local_postgres_data: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+    image: uptime_monitor_local_django
+    container_name: uptime_monitor_local_django
+    depends_on:
+      - postgres
+      - redis
+      - mailhog
+    volumes:
+      - .:/app:z
+    env_file:
+      - .envs/.django
+      - .envs/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    image: postgres:14
+    container_name: uptime_monitor_local_postgres
+    volumes:
+      - uptime_monitor_local_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .envs/.postgres
+
+  docs:
+    image: uptime_monitor_local_docs
+    container_name: uptime_monitor_local_docs
+    build:
+      context: .
+      dockerfile: ./docker/docs/Dockerfile
+    env_file:
+      - .envs/.django
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./uptime_monitor:/app/uptime_monitor:z
+    ports:
+      - "9000:9000"
+    command: /start-docs
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.0
+    container_name: uptime_monitor_local_mailhog
+    ports:
+      - "8025:8025"
+
+  redis:
+    image: redis:6
+    container_name: uptime_monitor_local_redis
+
+  celeryworker:
+    <<: *django
+    image: uptime_monitor_local_celeryworker
+    container_name: uptime_monitor_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: uptime_monitor_local_celerybeat
+    container_name: uptime_monitor_local_celerybeat
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+    ports: []
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: uptime_monitor_local_flower
+    container_name: uptime_monitor_local_flower
+    ports:
+      - "5555:5555"
+    command: /start-flower
