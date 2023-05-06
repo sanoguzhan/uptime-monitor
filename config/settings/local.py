@@ -20,7 +20,7 @@ ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = [("""Demo user""", "demo@demo.demo"),
+ADMINS = [("""Demo user""", "demo"),
           ]
 
 AUTHENTICATION_BACKENDS += [

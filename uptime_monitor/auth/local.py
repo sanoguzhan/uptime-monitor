@@ -13,7 +13,8 @@ class LocalAuth:
             admins = list(zip(*settings.ADMINS))[1]
             if username not in admins:
                 return None
-            user, _ = User.objects.get_or_create(email=username)
+            user, _ = User.objects.get_or_create(username=username)
+            user.name = username
             user.is_superuser = True
             user.is_staff = True
             user.save()
