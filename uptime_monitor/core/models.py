@@ -31,7 +31,10 @@ class SiteRegistry(models.Model):
     text = models.CharField(max_length=128, null=True, blank=True)
     hosted_at = models.CharField(max_length=128, null=True, blank=True)
     timeout = models.IntegerField(default=5)
-
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+    
+    def __str__(self) -> str:
+        return self.url
 
 
 class SiteResponseHistory(models.Model):
@@ -49,6 +52,8 @@ class SiteResponseHistory(models.Model):
             models.Index(fields=["-created_at"]),
         ]
 
+    def __str__(self) -> str:
+        return "{} - {}".format(self.check_registry.url, self.response_code)
 
 class ScheduleItem(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -65,3 +70,6 @@ class ScheduleItem(models.Model):
         indexes = [
             models.Index(fields=["check_registry"]),
         ]
+
+    def __str__(self) -> str:
+        return "{} - {}".format(self.name, self.schedule)
