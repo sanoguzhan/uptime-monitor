@@ -68,6 +68,17 @@ services:
     ports: []
     command: /start-celeryworker
 
+  celeryworker-save-history:
+    <<: *django
+    image: uptime_monitor_local_celeryworker
+    container_name: uptime_monitor_local_celeryworker-save-history
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+    ports: []
+
+    command: watchfiles celery.__main__.main --args '-A config.celery_app worker -Q response_history -l INFO'
   celerybeat:
     <<: *django
     image: uptime_monitor_local_celerybeat
