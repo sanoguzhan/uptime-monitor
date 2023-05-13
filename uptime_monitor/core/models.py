@@ -22,6 +22,21 @@ class SiteResponseStatus(models.TextChoices):
 
 
 class SiteRegistry(models.Model):
+    """
+    Model representing a site registry for monitoring website status.
+
+    Attributes:
+        user (ForeignKey): The user who created this site registry.
+        created_at (DateTimeField): The date and time when this site registry was created.
+        url (URLField): The URL of the website to be monitored.
+        status_code (IntegerField): The HTTP status code to be checked against.
+        http_method (CharField): The HTTP method to use for the request.
+        text (CharField): The text to search for in the response body.
+        hosted_at (CharField): The name of the hosting service for the website.
+        timeout (IntegerField): The maximum time allowed for the request before timing out.
+        last_checked_at (DateTimeField): The date and time when this site registry was last checked.
+    """
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     url = models.URLField(max_length=200)
@@ -38,11 +53,34 @@ class SiteRegistry(models.Model):
     timeout = models.IntegerField(default=5)
     last_checked_at = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["user"]),
+        ]
+
     def __str__(self) -> str:
+        """
+        Returns the URL of the website being monitored as a string.
+        """
         return self.url
 
 
+# Comment SiteResponseHistory model with docstring
+
+
 class SiteResponseHistory(models.Model):
+    """
+    SiteResponseHistory representing a site response history for monitoring website status.
+
+    Attributes:
+        check_registry (ForeignKey): The site registry that this response history belongs to.
+        response_code (CharField): The HTTP status code of the response.
+        response_text (CharField): The text of the response.
+        response_time (FloatField): The time taken to receive the response.
+        response_headers (TextField): The headers of the response.
+        created_at (DateTimeField): The date and time when this response history was created.
+    """
+
     check_registry = models.ForeignKey(
         SiteRegistry, on_delete=models.CASCADE, related_name="history"
     )
@@ -62,6 +100,17 @@ class SiteResponseHistory(models.Model):
 
 
 class ScheduleItem(models.Model):
+    """
+    ScheduleItem model representing a schedule item for monitoring website status.
+
+    Attributes:
+        name (CharField): The name of the schedule item.
+        check_registry (ForeignKey): The site registry that this schedule item belongs to.
+        schedule (CharField): The schedule of the schedule item.
+        schedule (ForeignKey): The schedule of the schedule item.
+        periodic_task (ForeignKey): The periodic task of the schedule item.
+    """
+
     name = models.CharField(max_length=64, unique=True)
     check_registry = models.ForeignKey(
         SiteRegistry, on_delete=models.CASCADE, related_name="schedules"
