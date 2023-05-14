@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from http import HTTPStatus
 from http import HTTPMethod
@@ -65,9 +66,6 @@ class SiteRegistry(models.Model):
         return self.url
 
 
-# Comment SiteResponseHistory model with docstring
-
-
 class SiteResponseHistory(models.Model):
     """
     SiteResponseHistory representing a site response history for monitoring website status.
@@ -106,19 +104,17 @@ class ScheduleItem(models.Model):
     Attributes:
         name (CharField): The name of the schedule item.
         check_registry (ForeignKey): The site registry that this schedule item belongs to.
-        schedule (CharField): The schedule of the schedule item.
         schedule (ForeignKey): The schedule of the schedule item.
         periodic_task (ForeignKey): The periodic task of the schedule item.
     """
+
+    PRODUCER_TASK_NAME = "check_site"
 
     name = models.CharField(max_length=64, unique=True)
     check_registry = models.ForeignKey(
         SiteRegistry, on_delete=models.CASCADE, related_name="schedules"
     )
-    schedule = models.CharField(max_length=64, default="* * * * *")
-    schedule = models.ForeignKey(
-        IntervalSchedule, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    schedule = models.ForeignKey(IntervalSchedule, on_delete=models.PROTECT)
     periodic_task = models.ForeignKey(
         PeriodicTask, on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -130,3 +126,30 @@ class ScheduleItem(models.Model):
 
     def __str__(self) -> str:
         return "{} - {}".format(self.name, self.schedule)
+
+    def save(self, *args, **kwargs):
+        """
+        Save the schedule item and create a periodic task if it does not exist.
+        """
+
+        try:
+            self.periodic_task = PeriodicTask.objects.get(
+                name=f"monitor_site_{self.name}"
+            )
+            self.periodic_task.interval = self.schedule
+            self.periodic_task.save()
+        except PeriodicTask.DoesNotExist:
+            self.periodic_task = PeriodicTask.objects.create(
+                name=f"monitor_site_{self.name}",
+                task=self.PRODUCER_TASK_NAME,
+                interval=self.schedule,
+                kwargs=json.dumps({"check_registry_id": self.check_registry.id}),
+            )
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """
+        Delete the schedule item and the periodic task.
+        """
+        self.periodic_task.delete()
+        super().delete(*args, **kwargs)
