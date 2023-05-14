@@ -31,21 +31,7 @@ services:
     env_file:
       - .envs/.postgres
 
-  docs:
-    image: uptime_monitor_local_docs
-    container_name: uptime_monitor_local_docs
-    build:
-      context: .
-      dockerfile: ./docker/docs/Dockerfile
-    env_file:
-      - .envs/.django
-    volumes:
-      - ./docs:/docs:z
-      - ./config:/app/config:z
-      - ./uptime_monitor:/app/uptime_monitor:z
-    ports:
-      - "9000:9000"
-    command: /start-docs
+
 
   mailhog:
     image: mailhog/mailhog:v1.0.0

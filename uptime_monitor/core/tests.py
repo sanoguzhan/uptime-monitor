@@ -1,9 +1,10 @@
-import httpx
 from unittest.mock import MagicMock
+
+import httpx
 import pytest
 
-from uptime_monitor.core.models import SiteResponseStatus, SiteRegistry
-from uptime_monitor.core.producer import evaluate_response, check_site
+from uptime_monitor.core.models import SiteRegistry, SiteResponseStatus
+from uptime_monitor.core.producer import check_site, evaluate_response
 
 
 @pytest.fixture
@@ -59,12 +60,12 @@ def test_evaluate_response_with_mismatched_status_code(site_registry_mock) -> No
 
 
 @pytest.mark.parametrize(
-    "status_code,text,expected_result",
+    "status_code,text",
     [
-        (200, "OK", SiteResponseStatus.PASS),
-        (404, "Not Found", SiteResponseStatus.FAIL),
-        (200, "Mismatch", SiteResponseStatus.MISMATCH),
-        (500, "", SiteResponseStatus.FAIL),
+        (200, "OK"),
+        (404, "Not Found"),
+        (200, "Mismatch"),
+        (500, ""),
     ],
 )
 def test_check_site(
@@ -72,7 +73,6 @@ def test_check_site(
     mocker: MagicMock,
     status_code: int,
     text: str,
-    expected_result: SiteResponseStatus,
 ) -> None:
     """Test check_site function with different response parameters."""
     mocker.patch.object(SiteRegistry.objects, "get", return_value=site_registry_mock)
