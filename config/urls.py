@@ -6,7 +6,7 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
-
+from uptime_monitor.core.urls import router
 urlpatterns = [
 
     path(
@@ -18,7 +18,7 @@ urlpatterns = [
     # User management
     path("users/", include("uptime_monitor.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    
+    path("api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
