@@ -1,9 +1,9 @@
 import json
-from django.db import models
-from http import HTTPStatus
-from http import HTTPMethod
+from http import HTTPMethod, HTTPStatus
 from typing import List, Tuple
+
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
