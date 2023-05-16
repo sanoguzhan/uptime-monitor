@@ -91,6 +91,7 @@ class SiteResponseHistory(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["-created_at"]),
+            models.Index(fields=["check_registry"]),
         ]
 
     def __str__(self) -> str:
