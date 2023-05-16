@@ -70,8 +70,6 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
-    "crispy_forms",
-    "crispy_bootstrap5",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -356,7 +354,5 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Uptime Monitor API",
     "DESCRIPTION": "Documentation of API endpoints of Uptime Monitor",
     "VERSION": "1.0.0",
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
 }
-# Your stuff...
-# ------------------------------------------------------------------------------

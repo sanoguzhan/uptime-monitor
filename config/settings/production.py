@@ -186,5 +186,3 @@ sentry_sdk.init(
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa F405
     {"url": "https://uptime-monitor.dev", "description": "Production server"}
 ]
-# Your stuff...
-# ------------------------------------------------------------------------------
